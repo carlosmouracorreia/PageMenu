@@ -26,7 +26,9 @@ import UIKit
     @objc optional func didMoveToPage(_ controller: UIViewController, index: Int)
 }
 
-open class CAPSPageMenu: UIViewController {
+
+
+open class CAPSPageMenu: UIViewController, ImageViewController {
 
     //MARK: - Configuration
     var configuration = CAPSPageMenuConfiguration()
@@ -35,9 +37,15 @@ open class CAPSPageMenu: UIViewController {
 
     let menuScrollView = UIScrollView()
     let controllerScrollView = UIScrollView()
-    var controllerArray : [UIViewController] = []
+    open var controllerArray : [UIViewController] = []
     var menuItems : [MenuItemView] = []
     var menuItemWidths : [CGFloat] = []
+    
+    var normalImages : [UIImage]?
+    var selectedImages : [UIImage]?
+    
+    public var menuImageWidth : CGFloat = 64.0
+    public var menuImageHeight : CGFloat = 64.0
     
     var totalMenuItemWidthIfDifferentWidths : CGFloat = 0.0
     
@@ -89,8 +97,11 @@ open class CAPSPageMenu: UIViewController {
         self.view.frame = frame
     }
     
-    public convenience init(viewControllers: [UIViewController], frame: CGRect, pageMenuOptions: [CAPSPageMenuOption]?) {
+    public convenience init(viewControllers: [UIViewController], normalImages: [UIImage]? = nil, selectedImages: [UIImage]? = nil, frame: CGRect, pageMenuOptions: [CAPSPageMenuOption]?) {
         self.init(viewControllers:viewControllers, frame:frame, options:nil)
+        
+        self.normalImages = normalImages
+        self.selectedImages = selectedImages
         
         if let options = pageMenuOptions {
             configurePageMenu(options: options)
@@ -197,6 +208,9 @@ extension CAPSPageMenu {
                     if self.menuItems[self.lastPageIndex].titleLabel != nil && self.menuItems[self.currentPageIndex].titleLabel != nil {
                         self.menuItems[self.lastPageIndex].titleLabel!.textColor = self.configuration.unselectedMenuItemLabelColor
                         self.menuItems[self.currentPageIndex].titleLabel!.textColor = self.configuration.selectedMenuItemLabelColor
+                    
+                        self.menuItems[self.currentPageIndex].setSelected(isSelected: true)
+                        self.menuItems[self.lastPageIndex].setSelected(isSelected: true)
                     }
                 }
             })
@@ -234,6 +248,16 @@ extension CAPSPageMenu {
     
     // MARK: - Orientation Change
     
+    
+    func titleLabelTopAndHeight() -> (y: CGFloat, height: CGFloat) {
+        var result: (y: CGFloat, height: CGFloat) = (0.0, 0.0)
+
+            result.y = 0.0
+            result.height = configuration.menuHeight
+
+        return result
+    }
+    
     override open func viewDidLayoutSubviews() {
         // Configure controller scroll view content size
         controllerScrollView.contentSize = CGSize(width: self.view.frame.width * CGFloat(controllerArray.count), height: self.view.frame.height - configuration.menuHeight)
@@ -261,7 +285,14 @@ extension CAPSPageMenu {
                 
                 for item : MenuItemView in menuItems as [MenuItemView] {
                     item.frame = CGRect(x: self.view.frame.width / CGFloat(controllerArray.count) * CGFloat(index), y: 0.0, width: self.view.frame.width / CGFloat(controllerArray.count), height: configuration.menuHeight)
-                    item.titleLabel!.frame = CGRect(x: 0.0, y: 0.0, width: self.view.frame.width / CGFloat(controllerArray.count), height: configuration.menuHeight)
+                  
+                    let position = titleLabelTopAndHeight()
+                
+                    
+                    item.titleLabel?.frame = CGRect(x: 0.0, y: position.y, width: self.view.frame.width / CGFloat(controllerArray.count), height: position.height)
+                    
+                    item.titleLabel?.isHidden = item.normalImage != nil
+                    
                     item.menuItemSeparator!.frame = CGRect(x: item.frame.width - (configuration.menuItemSeparatorWidth / 2), y: item.menuItemSeparator!.frame.origin.y, width: item.menuItemSeparator!.frame.width, height: item.menuItemSeparator!.frame.height)
                     
                     index += 1

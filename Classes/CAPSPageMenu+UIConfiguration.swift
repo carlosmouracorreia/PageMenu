@@ -60,6 +60,10 @@ extension CAPSPageMenu {
                 configuration.centerMenuItems = value
             case let .hideTopMenuBar(value):
                 configuration.hideTopMenuBar = value
+            case let .menuImageWidth(value):
+                configuration.menuImageWidth = value
+            case let .menuImageHeight(value):
+                configuration.menuImageHeight = value
             }
         }
         
@@ -161,7 +165,7 @@ extension CAPSPageMenu {
         
         var index : CGFloat = 0.0
         
-        for controller in controllerArray {
+        for (controllerIndex,controller) in controllerArray.enumerated() {
             if index == 0.0 {
                 // Add first two controllers to scrollview and as child view controller
                 controller.viewWillAppear(true)
@@ -208,6 +212,10 @@ extension CAPSPageMenu {
             }
             
             let menuItemView : MenuItemView = MenuItemView(frame: menuItemFrame)
+            
+            menuItemView.normalImage = self.normalImages?[controllerIndex]
+            menuItemView.selectedImage = self.selectedImages?[controllerIndex]
+            
             menuItemView.configure(for: self, controller: controller, index: index)
             
             // Add menu item view to menu scroll view
@@ -226,6 +234,8 @@ extension CAPSPageMenu {
         if menuItems.count > 0 {
             if menuItems[currentPageIndex].titleLabel != nil {
                 menuItems[currentPageIndex].titleLabel!.textColor = configuration.selectedMenuItemLabelColor
+                
+                menuItems[currentPageIndex].setSelected(isSelected: true)
             }
         }
         

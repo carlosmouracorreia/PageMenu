@@ -8,14 +8,42 @@
 
 import UIKit
 
+
+
+protocol ImageViewController {
+    
+}
+
+extension ImageViewController {
+    func normalImage() -> UIImage? {
+        return nil
+    }
+    func selectedImage() -> UIImage? {
+        return nil
+    }
+}
+
 class MenuItemView: UIView {
     // MARK: - Menu item view
     
     var titleLabel : UILabel?
     var menuItemSeparator : UIView?
+    var imageView: UIImageView?
+    var normalImage: UIImage?
+    var selectedImage: UIImage?
     
-    func setUpMenuItemView(_ menuItemWidth: CGFloat, menuScrollViewHeight: CGFloat, indicatorHeight: CGFloat, separatorPercentageHeight: CGFloat, separatorWidth: CGFloat, separatorRoundEdges: Bool, menuItemSeparatorColor: UIColor) {
-        titleLabel = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: menuItemWidth, height: menuScrollViewHeight - indicatorHeight))
+    func setUpMenuItemView(_ menuItemWidth: CGFloat, menuScrollViewHeight: CGFloat, indicatorHeight: CGFloat, separatorPercentageHeight: CGFloat, separatorWidth: CGFloat, separatorRoundEdges: Bool, menuItemSeparatorColor: UIColor, menuImageWidth: CGFloat, menuImageHeight: CGFloat) {
+        
+        
+        
+        var result: (y: CGFloat, height: CGFloat) = (0.0, 0.0)
+      
+            result.y = 0.0
+            result.height = menuScrollViewHeight
+       
+        
+        titleLabel = UILabel(frame: CGRect(x: 0.0, y: result.y, width: menuItemWidth, height: result.height - indicatorHeight))
+
         
         menuItemSeparator = UIView(frame: CGRect(x: menuItemWidth - (separatorWidth / 2), y: floor(menuScrollViewHeight * ((1.0 - separatorPercentageHeight) / 2.0)), width: separatorWidth, height: floor(menuScrollViewHeight * separatorPercentageHeight)))
         menuItemSeparator!.backgroundColor = menuItemSeparatorColor
@@ -27,7 +55,33 @@ class MenuItemView: UIView {
         menuItemSeparator!.isHidden = true
         self.addSubview(menuItemSeparator!)
         
-        self.addSubview(titleLabel!)
+        if let normalImage = self.normalImage {
+            self.imageView = UIImageView(image: normalImage)
+            self.imageView!.contentMode = .scaleAspectFill
+            self.imageView!.frame = CGRect(x: floor((menuItemWidth - menuImageWidth) / 2),y: 0,width: menuImageWidth, height: menuImageHeight)
+            self.addSubview(self.imageView!)
+        } else {
+            self.addSubview(titleLabel!)
+        }
+        
+    }
+    
+    func setSelected(isSelected: Bool, animated: Bool = true) {
+        guard let imageView = self.imageView else { return }
+        
+        if animated {
+            let transition = CATransition()
+            transition.duration = 0.25
+            transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+            transition.type = kCATransitionFade
+            imageView.layer.add(transition, forKey: nil)
+        }
+        
+        if isSelected && selectedImage != nil {
+            imageView.image = selectedImage!
+        } else if normalImage != nil {
+            imageView.image = normalImage!
+        }
     }
     
     func setTitleText(_ text: NSString) {
@@ -44,13 +98,13 @@ class MenuItemView: UIView {
             if pageMenu.menuItemMargin > 0 {
                 let marginSum = pageMenu.menuItemMargin * CGFloat(pageMenu.controllerArray.count + 1)
                 let menuItemWidth = (pageMenu.view.frame.width - marginSum) / CGFloat(pageMenu.controllerArray.count)
-                self.setUpMenuItemView(menuItemWidth, menuScrollViewHeight: pageMenu.configuration.menuHeight, indicatorHeight: pageMenu.configuration.selectionIndicatorHeight, separatorPercentageHeight: pageMenu.configuration.menuItemSeparatorPercentageHeight, separatorWidth: pageMenu.configuration.menuItemSeparatorWidth, separatorRoundEdges: pageMenu.configuration.menuItemSeparatorRoundEdges, menuItemSeparatorColor: pageMenu.configuration.menuItemSeparatorColor)
+                self.setUpMenuItemView(menuItemWidth, menuScrollViewHeight: pageMenu.configuration.menuHeight, indicatorHeight: pageMenu.configuration.selectionIndicatorHeight, separatorPercentageHeight: pageMenu.configuration.menuItemSeparatorPercentageHeight, separatorWidth: pageMenu.configuration.menuItemSeparatorWidth, separatorRoundEdges: pageMenu.configuration.menuItemSeparatorRoundEdges, menuItemSeparatorColor: pageMenu.configuration.menuItemSeparatorColor, menuImageWidth: pageMenu.configuration.menuImageWidth, menuImageHeight: pageMenu.configuration.menuImageHeight)
             } else {
-                self.setUpMenuItemView(CGFloat(pageMenu.view.frame.width) / CGFloat(pageMenu.controllerArray.count), menuScrollViewHeight: pageMenu.configuration.menuHeight, indicatorHeight: pageMenu.configuration.selectionIndicatorHeight, separatorPercentageHeight: pageMenu.configuration.menuItemSeparatorPercentageHeight, separatorWidth: pageMenu.configuration.menuItemSeparatorWidth, separatorRoundEdges: pageMenu.configuration.menuItemSeparatorRoundEdges, menuItemSeparatorColor: pageMenu.configuration.menuItemSeparatorColor)
+                self.setUpMenuItemView(CGFloat(pageMenu.view.frame.width) / CGFloat(pageMenu.controllerArray.count), menuScrollViewHeight: pageMenu.configuration.menuHeight, indicatorHeight: pageMenu.configuration.selectionIndicatorHeight, separatorPercentageHeight: pageMenu.configuration.menuItemSeparatorPercentageHeight, separatorWidth: pageMenu.configuration.menuItemSeparatorWidth, separatorRoundEdges: pageMenu.configuration.menuItemSeparatorRoundEdges, menuItemSeparatorColor: pageMenu.configuration.menuItemSeparatorColor, menuImageWidth: pageMenu.configuration.menuImageWidth, menuImageHeight: pageMenu.configuration.menuImageHeight)
             }
             //**************************拡張ここまで*************************************
         } else {
-            self.setUpMenuItemView(pageMenu.configuration.menuItemWidth, menuScrollViewHeight: pageMenu.configuration.menuHeight, indicatorHeight: pageMenu.configuration.selectionIndicatorHeight, separatorPercentageHeight: pageMenu.configuration.menuItemSeparatorPercentageHeight, separatorWidth: pageMenu.configuration.menuItemSeparatorWidth, separatorRoundEdges: pageMenu.configuration.menuItemSeparatorRoundEdges, menuItemSeparatorColor: pageMenu.configuration.menuItemSeparatorColor)
+            self.setUpMenuItemView(pageMenu.configuration.menuItemWidth, menuScrollViewHeight: pageMenu.configuration.menuHeight, indicatorHeight: pageMenu.configuration.selectionIndicatorHeight, separatorPercentageHeight: pageMenu.configuration.menuItemSeparatorPercentageHeight, separatorWidth: pageMenu.configuration.menuItemSeparatorWidth, separatorRoundEdges: pageMenu.configuration.menuItemSeparatorRoundEdges, menuItemSeparatorColor: pageMenu.configuration.menuItemSeparatorColor, menuImageWidth: pageMenu.configuration.menuImageWidth, menuImageHeight: pageMenu.configuration.menuImageHeight)
         }
         
         // Configure menu item label font if font is set by user
@@ -58,6 +112,8 @@ class MenuItemView: UIView {
         
         self.titleLabel!.textAlignment = NSTextAlignment.center
         self.titleLabel!.textColor = pageMenu.configuration.unselectedMenuItemLabelColor
+        
+        self.setSelected(isSelected: false)
         
         //**************************拡張*************************************
         self.titleLabel!.adjustsFontSizeToFitWidth = pageMenu.configuration.titleTextSizeBasedOnMenuItemWidth

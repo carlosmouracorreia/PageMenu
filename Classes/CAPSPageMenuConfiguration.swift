@@ -35,6 +35,10 @@ public class CAPSPageMenuConfiguration {
     open var enableHorizontalBounce : Bool = true
     open var hideTopMenuBar : Bool = false
     
+    open var menuImageWidth: CGFloat = 64.0
+    open var menuImageHeight: CGFloat = 64.0
+
+    
     public init() {
         
     }
