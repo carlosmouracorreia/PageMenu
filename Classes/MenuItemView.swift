@@ -60,9 +60,10 @@ class MenuItemView: UIView {
             self.imageView!.contentMode = .scaleAspectFill
             self.imageView!.frame = CGRect(x: floor((menuItemWidth - menuImageWidth) / 2),y: 0,width: menuImageWidth, height: menuImageHeight)
             self.addSubview(self.imageView!)
-        } else {
-            self.addSubview(titleLabel!)
         }
+        
+        self.addSubview(titleLabel!)
+        
         
     }
     
@@ -132,5 +133,19 @@ class MenuItemView: UIView {
                 self.menuItemSeparator!.isHidden = false
             }
         }
+    }
+}
+
+extension UILabel {
+    func countLines() -> Int {
+        // Call self.layoutIfNeeded() if your view uses auto layout
+        guard let myText = self.text else {
+            return 0
+        }
+        
+        let rect = CGSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+        let labelSize = myText.boundingRect(with: rect, options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font: self.font], context: nil)
+        
+        return Int(ceil(CGFloat(labelSize.height) / self.font.lineHeight))
     }
 }

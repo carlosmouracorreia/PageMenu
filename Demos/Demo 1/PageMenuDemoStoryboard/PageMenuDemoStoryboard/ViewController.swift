@@ -61,14 +61,14 @@ class ViewController: UIViewController {
             .bottomMenuHairlineColor(UIColor(red: 70.0/255.0, green: 70.0/255.0, blue: 80.0/255.0, alpha: 1.0)),
             .menuItemFont(UIFont(name: "HelveticaNeue", size: 13.0)!),
             .menuHeight(50.0),
-            .menuItemWidth(90.0),
             .centerMenuItems(true),
             .menuImageWidth(32.0),
-            .menuImageHeight(32.0)
+            .menuImageHeight(32.0),
+            .useMenuLikeSegmentedControl(true)
         ]
         
         // Initialize scroll menu
-        pageMenu = CAPSPageMenu(viewControllers: controllerArray, normalImages: nil, frame: CGRect(x: 0.0, y: 0.0, width: self.view.frame.width, height: self.view.frame.height), pageMenuOptions: parameters)
+        pageMenu = CAPSPageMenu(viewControllers: controllerArray, normalImages: normalImages, frame: CGRect(x: 0.0, y: 0.0, width: self.view.frame.width, height: self.view.frame.height), pageMenuOptions: parameters)
 
 		self.addChildViewController(pageMenu!)
         self.view.addSubview(pageMenu!.view)

@@ -268,6 +268,15 @@ extension CAPSPageMenu {
             currentOrientationIsPortrait = UIDevice.current.orientation.isPortrait || UIDevice.current.orientation.isFlat
         }
         
+        // Tweak to library - alternate between images/text depending on text being trimmed
+        var showImages = false
+        for item : MenuItemView in menuItems as [MenuItemView] {
+            showImages = showImages || item.titleLabel?.countLines() ?? 0 > 1
+            item.titleLabel?.isHidden = showImages
+            item.imageView?.isHidden = !showImages
+        }
+        
+        
         if (oldCurrentOrientationIsPortrait && UIDevice.current.orientation.isLandscape) || (!oldCurrentOrientationIsPortrait && (UIDevice.current.orientation.isPortrait || UIDevice.current.orientation.isFlat)) {
             didLayoutSubviewsAfterRotation = true
             
@@ -291,7 +300,10 @@ extension CAPSPageMenu {
                     
                     item.titleLabel?.frame = CGRect(x: 0.0, y: position.y, width: self.view.frame.width / CGFloat(controllerArray.count), height: position.height)
                     
-                    item.titleLabel?.isHidden = item.normalImage != nil
+                   
+                  
+                   // print("item called: \(self.titleLabel?.text ?? "") has nr of lines: \(self.titleLabel?.countLines() ?? 0)")
+
                     
                     item.menuItemSeparator!.frame = CGRect(x: item.frame.width - (configuration.menuItemSeparatorWidth / 2), y: item.menuItemSeparator!.frame.origin.y, width: item.menuItemSeparator!.frame.width, height: item.menuItemSeparator!.frame.height)
                     
@@ -311,6 +323,8 @@ extension CAPSPageMenu {
                 var index : Int = 0
                 
                 for item : MenuItemView in menuItems as [MenuItemView] {
+
+                    
                     if index == 0 {
                         item.frame = CGRect(x: startingMenuMargin + configuration.menuMargin, y: 0.0, width: configuration.menuItemWidth, height: configuration.menuHeight)
                     } else {
