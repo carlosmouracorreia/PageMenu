@@ -272,6 +272,8 @@ extension CAPSPageMenu {
         var showImages = false
         for item : MenuItemView in menuItems as [MenuItemView] {
             showImages = showImages || item.titleLabel?.countLines() ?? 0 > 1
+        }
+        for item : MenuItemView in menuItems as [MenuItemView] {
             item.titleLabel?.isHidden = showImages
             item.imageView?.isHidden = !showImages
         }
